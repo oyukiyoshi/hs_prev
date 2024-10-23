@@ -119,17 +119,17 @@ class _ListScreenState extends ConsumerState<ListScreen> {
                                       context: context,
                                       builder: (BuildContext context) {
                                         return AlertDialog(
-                                          title: Text(
+                                          title: const Text(
                                             fileDeleteCheck,
-                                            style: const TextStyle(fontSize: fontSize),
+                                            style: TextStyle(fontSize: fontSize),
                                           ),
                                           actions: <Widget>[
                                             InkWell(
-                                              child: Padding(
+                                              child: const Padding(
                                                 padding: EdgeInsets.all(paddingSize),
                                                 child: Text(
                                                   userReactionNo,
-                                                  style: const TextStyle(fontSize: fontSize),
+                                                  style: TextStyle(fontSize: fontSize),
                                                 ),
                                               ),
                                               onTap: () {
@@ -137,11 +137,11 @@ class _ListScreenState extends ConsumerState<ListScreen> {
                                               },
                                             ),
                                             InkWell(
-                                              child: Padding(
+                                              child: const Padding(
                                                 padding: EdgeInsets.all(paddingSize),
                                                 child: Text(
                                                   userReactionYes,
-                                                  style: const TextStyle(fontSize: fontSize),
+                                                  style: TextStyle(fontSize: fontSize),
                                                 ),
                                               ),
                                               onTap: () async {

@@ -1,3 +1,6 @@
 # .env
 /server/.env
 /client/assets/.env
+
+# assets
+/server/md/*
