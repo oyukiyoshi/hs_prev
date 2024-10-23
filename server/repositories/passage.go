@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"database/sql"
+	"time"
 
 	"github.com/oyukiyoshi/hs/models"
 )
@@ -27,12 +28,32 @@ func SelectPassage(db *sql.DB, sentenceID int) ([]models.Passage, error) {
 }
 
 func UpdatePassage(db *sql.DB, passage models.Passage) error {
-	const sqlStr = `
-		update passage set tag_id = $1 where sentence_id = $2 and line_no = $3;
-	`
-	_, err := db.Exec(sqlStr, passage.TagID, passage.SentenceID, passage.LineNo)
+	tx, err := db.Begin()
 	if err != nil {
 		return err
 	}
+
+	const sqlPassage = `
+		update passage set tag_id = $1 where sentence_id = $2 and line_no = $3;
+	`
+	_, err = tx.Exec(sqlPassage, passage.TagID, passage.SentenceID, passage.LineNo)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	const sqlSentence = `
+		update sentence set changed_at = $1 where sentence_id = $2;
+	`
+	_, err = tx.Exec(sqlSentence, time.Now(), passage.SentenceID)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	if err = tx.Commit(); err != nil {
+		return err
+	}
+
 	return nil
 }

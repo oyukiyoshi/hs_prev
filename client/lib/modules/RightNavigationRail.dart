@@ -5,7 +5,8 @@ import 'package:go_router/go_router.dart';
 import '../const.dart';
 
 class RightNavigationRail extends ConsumerWidget {
-  const RightNavigationRail({super.key});
+  final int selectedIndexI;
+  const RightNavigationRail({super.key, required this.selectedIndexI});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -14,7 +15,7 @@ class RightNavigationRail extends ConsumerWidget {
     return LayoutBuilder(builder: (context, constraints) {
       return Center(
         child: NavigationRail(
-          selectedIndex: menuSelectedIndex,
+          selectedIndex: selectedIndexI != 0 ? selectedIndexI : menuSelectedIndex,
           extended: constraints.maxWidth >= extendWidth,
           onDestinationSelected: (value) {
             ref.read(rightNavigationRailSelectedIndexNotifierProvider.notifier).updateState(value);
@@ -30,11 +31,17 @@ class RightNavigationRail extends ConsumerWidget {
           destinations: const [
             NavigationRailDestination(
               icon: Icon(Icons.article),
-              label: Text('Sentences'),
+              label: Text(
+                'Sentences',
+                style: TextStyle(fontSize: fontSize),
+              ),
             ),
             NavigationRailDestination(
               icon: Icon(Icons.tag),
-              label: Text('Tags'),
+              label: Text(
+                'Tags',
+                style: TextStyle(fontSize: fontSize),
+              ),
             ),
           ],
         ),

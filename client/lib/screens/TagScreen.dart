@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:html' as html;
 
 import 'package:client/modules/TagScreen/TagScreenPost.dart';
 import 'package:client/modules/TagScreen/TextEditingDialog.dart';
@@ -32,11 +33,24 @@ class _TagScreenState extends ConsumerState<TagScreen> {
     }
   }
 
+  void changeTabTitle(String newTitle) {
+    html.document.title = newTitle;
+  }
+  @override
+  void initState() {
+    super.initState();
+    changeTabTitle(constAppTabPrefix + constTags);
+  }
+
   @override
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
+      appBar: AppBar(
+        title: const Text(constTags),
+        centerTitle: true,
+      ),
       body: FutureBuilder<List<Tag>>(
         future: _connectToServer(),
         builder: (context, snapshot) {
@@ -56,7 +70,7 @@ class _TagScreenState extends ConsumerState<TagScreen> {
               children: [
                 const Flexible(
                   flex: 1,
-                  child: RightNavigationRail(),
+                  child: RightNavigationRail(selectedIndexI: 1,),
                 ),
                 Flexible(
                   flex: 3,
@@ -73,11 +87,9 @@ class _TagScreenState extends ConsumerState<TagScreen> {
                             final result = await showEditingDialog(context, name,);
                             if (result != null && result.isNotEmpty) {
                               Tag newTag = Tag(tagId: tag.tagId, tagColor: tag.tagColor, tagName: result);
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => TagScreenPost(tag: newTag)),
-                              );
+                              await TagScreenPost(tag: newTag).connectToServer();
                             }
+                            setState(() {});
                           },
                           child: Padding(
                             padding: const EdgeInsets.all(paddingSize),
@@ -85,10 +97,11 @@ class _TagScreenState extends ConsumerState<TagScreen> {
                               children: [
                                 Icon(
                                   Icons.square,
-                                  color: Color(int.parse('FF${tag.tagColor}', radix: 16)),
+                                  color: tag.tagColor != "ffffff" ? Color(int.parse('FF${tag.tagColor}', radix: 16)) : Colors.transparent,
                                 ),
                                 const SizedBox(width: 10,),
-                                Text(tag.tagName,
+                                Text(
+                                  tag.tagName,
                                   style: const TextStyle(fontSize: fontSize),
                                 ),
                               ],

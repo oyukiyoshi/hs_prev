@@ -34,8 +34,8 @@ func NewRouter(db *sql.DB) *chi.Mux {
 	// tag handlers
 	r.Get("/tag", tCon.GetTagHandler)
 	r.Post("/tag", tCon.PostTagHandler)
-	r.Delete("/tag/{tagID:[0-9]+}", tCon.DeleteTagHandler)
-	r.Post("/tag/create", tCon.CreateTagHandler)
+	r.Delete("/tag/{tagID:[0-9]+}", tCon.DeleteTagHandler) // schedule
+	r.Post("/tag/create", tCon.CreateTagHandler)           // schedule
 
 	return r
 }

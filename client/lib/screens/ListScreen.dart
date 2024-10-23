@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:html' as html;
 
 import 'package:client/modules/ListScreen/FilePick.dart';
 import 'package:client/modules/ListScreen/ListScreenDelete.dart';
@@ -31,8 +32,17 @@ class _ListScreenState extends ConsumerState<ListScreen> {
           .map((json) => Sentence.fromJson(json as Map<String, dynamic>))
           .toList();
     } else {
-      throw Exception('Failed to load sentences');
+      return [];
     }
+  }
+
+  void changeTabTitle(String newTitle) {
+    html.document.title = newTitle;
+  }
+  @override
+  void initState() {
+    super.initState();
+    changeTabTitle(constAppTabPrefix + constSentences);
   }
 
   @override
@@ -40,6 +50,10 @@ class _ListScreenState extends ConsumerState<ListScreen> {
     final double screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
+      appBar: AppBar(
+        title: const Text(constSentences),
+        centerTitle: true,
+      ),
       body: FutureBuilder<List<Sentence>>(
         future: _connectToServer(),
         builder: (context, snapshot) {
@@ -49,23 +63,23 @@ class _ListScreenState extends ConsumerState<ListScreen> {
           } else if (snapshot.hasError) {
             // エラー発生
             return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            // データなし
-            return const Center(child: Text('No sentences available.'));
-          } else {
+          } 
             // 成功
             final sentenceList = snapshot.data!;
             return Row(
               children: [
                 const Flexible(
                   flex: 1,
-                  child: RightNavigationRail(),
+                  child: RightNavigationRail(selectedIndexI: 0,),
                 ),
                 Flexible(
                   flex: 3,
                   child: ListView.builder(
                     itemCount: sentenceList.length,
                     itemBuilder: (context, index) {
+                      if (sentenceList.isEmpty) {
+                        return Container();
+                      }
                       final sentence = sentenceList[index];
                       final jst = DateTime.parse(sentence.changedAt.toUtc().toIso8601String()).toLocal();
                       return Container(
@@ -86,24 +100,61 @@ class _ListScreenState extends ConsumerState<ListScreen> {
                                 ),
                                 Align(
                                   alignment: Alignment.bottomRight,
-                                    child: Text(DateFormat('yyyy/M/d h:m').format(jst),
+                                    child: Text(DateFormat('yyyy/M/d HH:mm').format(jst),
                                     style: const TextStyle(fontSize: fontSize * 0.7),
                                   ),
                                 ),
-                                SizedBox(width: sizedBoxWidth,),
+                                const SizedBox(width: sizedBoxWidth,),
                                 ElevatedButton(
                                   onPressed: () async {
-                                    await downloadFile('${dotenv.get('API_SERVER')}/list/download/${sentence.sentenceId}', sentence.sentenceName);
+                                    await downloadFile('${dotenv.get('API_SERVER')}/list/download/${sentence.sentenceId}', '${sentence.sentenceName}.md');
                                   },
                                   child: const Icon(Icons.download)
                                 ),
-                                SizedBox(width: sizedBoxWidth,),
+                                const SizedBox(width: sizedBoxWidth,),
                                 ElevatedButton(
-                                  onPressed: () async {
-                                    await ListScreenDelete(sentenceID: sentence.sentenceId).connectToServer();
-                                    setState(() {});
-                                  }, 
-                                  child: const Icon(Icons.delete_forever_outlined)
+                                  child: const Icon(Icons.delete_forever_outlined),
+                                  onPressed: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: Text(
+                                            fileDeleteCheck,
+                                            style: const TextStyle(fontSize: fontSize),
+                                          ),
+                                          actions: <Widget>[
+                                            InkWell(
+                                              child: Padding(
+                                                padding: EdgeInsets.all(paddingSize),
+                                                child: Text(
+                                                  userReactionNo,
+                                                  style: const TextStyle(fontSize: fontSize),
+                                                ),
+                                              ),
+                                              onTap: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                            ),
+                                            InkWell(
+                                              child: Padding(
+                                                padding: EdgeInsets.all(paddingSize),
+                                                child: Text(
+                                                  userReactionYes,
+                                                  style: const TextStyle(fontSize: fontSize),
+                                                ),
+                                              ),
+                                              onTap: () async {
+                                                await ListScreenDelete(sentenceID: sentence.sentenceId).connectToServer();
+                                                setState(() {});
+                                                Navigator.of(context).pop();
+                                              },
+                                            ),
+                                          ],
+                                        );
+                                      }
+                                    );
+                                  }
                                 ),
                               ],
                             ),
@@ -119,8 +170,7 @@ class _ListScreenState extends ConsumerState<ListScreen> {
                 ),
               ],
             );
-          }
-        },
+        }
       ),
     );
   }

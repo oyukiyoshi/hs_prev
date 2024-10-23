@@ -30,7 +30,6 @@ class _PassageTextState extends ConsumerState<PassageText> {
 
   @override
   Widget build(BuildContext context) {
-    final double screenWidth = MediaQuery.of(context).size.width;
     final isClicked = ref.watch(clickedPassageTextProvider.select((state) => state.contains(no)));
     final selectedTextColor = ref.watch(textColorProvider.select((state) {
       final map = state.firstWhere(
@@ -40,45 +39,65 @@ class _PassageTextState extends ConsumerState<PassageText> {
       return map[no];
     }));
 
-
     return Padding(
       padding: const EdgeInsets.all(paddingSize),
       child: Row(
         children: [
-          Text(no.toString()),
-          const SizedBox(width: sizedBoxWidth),
-          GestureDetector(
-            onTap: () {
-              if (isClicked) {
-                ref.read(clickedPassageTextProvider.notifier).removeNo(no);
-                
-              } else {
-                ref.read(clickedPassageTextProvider.notifier).addNo(no);
-              }
-            },
-            child: MouseRegion(
-              onEnter: (_) {
-                setState(() {
-                  _isHovered = true;
-                });
+          Flexible(
+            flex: 5,
+            child: Container(
+              alignment: Alignment.center,
+              width: 30,
+              child: Text(
+                no.toString(),
+                style: const TextStyle(
+                  color: Colors.blueGrey,
+                  fontSize: fontSize * 0.8,
+                ),  
+              ),
+            ),
+          ),
+          Flexible(
+            flex: 1,
+            child: Container(),
+          ),
+          Flexible(
+            flex: 70,
+            child: GestureDetector(
+              onTap: () {
+                if (isClicked) {
+                  ref.read(clickedPassageTextProvider.notifier).removeNo(no);
+                  
+                } else {
+                  ref.read(clickedPassageTextProvider.notifier).addNo(no);
+                }
               },
-              onExit: (_) {
-                setState(() {
-                  _isHovered = false;
-                });
-              },
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(5),
-                  color: selectedTextColor != null ? Color(int.parse("FF$selectedTextColor", radix: 16)) : Color(int.parse("FF$textColor", radix: 16)),
-                  border: (isClicked || _isHovered) 
-                    ? Border.all(color: Colors.grey, width: borderWidth) 
-                    : Border.all(color: Colors.transparent, width: borderWidth),
-                ),
-                constraints: BoxConstraints(maxWidth: screenWidth * screenWidthRatio),
-                child: Text(
-                  content,
-                  softWrap: true,
+              child: MouseRegion(
+                onEnter: (_) {
+                  setState(() {
+                    _isHovered = true;
+                  });
+                },
+                onExit: (_) {
+                  setState(() {
+                    _isHovered = false;
+                  });
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(5),
+                    color: selectedTextColor != null 
+                      ? (selectedTextColor != "ffffff" ? Color(int.parse("FF$selectedTextColor", radix: 16)) : Colors.transparent) 
+                      : (textColor != "ffffff" ? Color(int.parse("FF$textColor", radix: 16)) : Colors.transparent),
+                    border: (isClicked || _isHovered) 
+                      ? Border.all(color: Colors.grey, width: borderWidth) 
+                      : Border.all(color: Colors.transparent, width: borderWidth),
+                  ),
+                  child: Text(
+                    content,
+                    softWrap: true,
+                    style: const TextStyle(fontSize: fontSize),
+                  ),
                 ),
               ),
             ),

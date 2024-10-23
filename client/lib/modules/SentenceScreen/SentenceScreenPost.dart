@@ -26,7 +26,6 @@ class SentenceScreenPost {
         textType: passage.textType, 
         passageContent: passage.passageContent
       );
-      print(passage.lineNo);
 
       final res = await http.post(
         url,

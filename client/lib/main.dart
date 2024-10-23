@@ -8,8 +8,8 @@ void main() async {
   print(envFile);
   await dotenv.load(fileName: ".env");
 
-  final app = const MyApp();
-  final scope = ProviderScope(child: app);
+  const app = MyApp();
+  const scope = ProviderScope(child: app);
   runApp(scope);
 }
 
@@ -19,6 +19,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
+      debugShowCheckedModeBanner: false,  // debug ラベル
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
         useMaterial3: true,

@@ -66,12 +66,12 @@ class _FilePickState extends State<FilePick> {
             context.go('/sentence/$sentenceId');
           }
         },
-        child: const Icon(Icons.upload_file_outlined),
         style: OutlinedButton.styleFrom(
           shape: const CircleBorder(),
           padding: const EdgeInsets.all(20),
           minimumSize: const Size(50, 50),
         ),
+        child: const Icon(Icons.upload_file_outlined),
       ),
     );
   }

@@ -10,7 +10,7 @@ final router = GoRouter(
     GoRoute(
       name: 'List',
       path: '/list',
-      builder: (context, state) => ListScreen()
+      builder: (context, state) => const ListScreen()
     ),
     GoRoute(
       name: 'Sentence',
@@ -22,7 +22,7 @@ final router = GoRouter(
     GoRoute(
       name: 'Tag',
       path: '/tag',
-      builder: (context, state) => TagScreen()
+      builder: (context, state) => const TagScreen()
     ),
   ],
 );
