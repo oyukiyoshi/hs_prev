@@ -1,6 +1,8 @@
 package services
 
 import (
+	"os"
+
 	"github.com/oyukiyoshi/hs/apperrors"
 	"github.com/oyukiyoshi/hs/models"
 	"github.com/oyukiyoshi/hs/repositories"
@@ -30,10 +32,21 @@ func (s *MyAppService) PostSentenceService(sentence models.Sentence, passages []
 }
 
 func (s *MyAppService) DeleteSentenceService(sentenceID int) error {
-	err := repositories.DeleteSentence(s.db, sentenceID)
+	sentenceName, err := repositories.SpecificSelectSentence(s.db, sentenceID)
 	if err != nil {
 		return err
 	}
+
+	err = repositories.DeleteSentence(s.db, sentenceID)
+	if err != nil {
+		return err
+	}
+
+	err = os.Remove("./md/" + sentenceName + ".md")
+	if err != nil {
+		return nil
+	}
+
 	return nil
 }
 

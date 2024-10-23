@@ -14,6 +14,7 @@ func NewRouter(db *sql.DB) *chi.Mux {
 	sCon := controllers.NewSentenceController(ser)
 	smCon := controllers.NewSentenceModuleController(ser, ser)
 	pCon := controllers.NewPassageController(ser)
+	pmCon := controllers.NewPassageModuleController(ser, ser)
 	tCon := controllers.NewTagController(ser)
 
 	r := chi.NewRouter()
@@ -23,18 +24,18 @@ func NewRouter(db *sql.DB) *chi.Mux {
 	// list handlers
 	r.Get("/list", sCon.GetSentenceListHandler)
 	r.Post("/list", smCon.PostSentenceHandler)
-	r.Delete("/list", sCon.DeleteSentenceHandler)
+	r.Delete("/list/{sentenceID:[0-9]+}", sCon.DeleteSentenceHandler)
 	r.Get("/list/download/{sentenceID:[0-9]+}", sCon.GetSentenceFileHandler)
 
 	// sentence handlers
 	r.Get("/sentence/{sentenceID:[0-9]+}", pCon.GetSentenceHandler)
-	r.Post("/sentence", pCon.PostSentenceHandler)
+	r.Post("/sentence", pmCon.PostSentenceHandler)
 
 	// tag handlers
 	r.Get("/tag", tCon.GetTagHandler)
 	r.Post("/tag", tCon.PostTagHandler)
-	r.Delete("/tag", tCon.DeleteTagHandler)
-	// r.Post("/tag/create", tCon.CreateTagHandler)
+	r.Delete("/tag/{tagID:[0-9]+}", tCon.DeleteTagHandler)
+	r.Post("/tag/create", tCon.CreateTagHandler)
 
 	return r
 }

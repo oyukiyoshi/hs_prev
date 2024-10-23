@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'package:client/modules/riverpod/PassageTextColorProvider.dart';
 import 'package:client/modules/riverpod/PassageTextIsClickedProvider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
-import 'package:client/const.dart';
 import 'package:client/data.dart';
 
 
@@ -17,7 +17,7 @@ class SentenceScreenPost {
   Future<int> connectToServerSequentially() async {
     bool err = false;
     for (var passage in passageList) {
-      final url = Uri.parse('$baseURL/sentence');
+      final url = Uri.parse('${dotenv.get('API_SERVER')}/sentence');
       final headers = {'content-type': 'application/json'};
       final req = Passage(
         sentenceId: passage.sentenceId, 

@@ -26,7 +26,7 @@ func SelectTag(db *sql.DB) ([]models.Tag, error) {
 	return tagArray, nil
 }
 
-/* func InsertTag(db *sql.DB, tag models.Tag) (models.Tag, error) {
+func InsertTag(db *sql.DB, tag models.Tag) error {
 	const sqlStr = `
 		insert into tag (tag_color, tag_name) values ($1, $2) returning tag_id;
 	`
@@ -35,11 +35,11 @@ func SelectTag(db *sql.DB) ([]models.Tag, error) {
 	newSentence.TagID = tag.TagID
 	err := db.QueryRow(sqlStr, tag.TagColor, tag.TagNmae).Scan(&newTagID)
 	if err != nil {
-		return models.Tag{}, err
+		return err
 	}
 	newSentence.TagID = newTagID
-	return newSentence, nil
-} */
+	return nil
+}
 
 func UpdateTag(db *sql.DB, tag models.Tag) error {
 	const sqlStr = `

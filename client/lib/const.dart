@@ -1,9 +1,6 @@
 // 文字
 const String changeText = '変更';
 
-// URL 基準
-const String baseURL = 'http://localhost:3000';
-
 // font 系
 const double fontSize = 16;
 

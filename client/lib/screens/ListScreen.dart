@@ -1,7 +1,9 @@
 import 'dart:convert';
 
 import 'package:client/modules/ListScreen/FilePick.dart';
+import 'package:client/modules/ListScreen/ListScreenDelete.dart';
 import 'package:client/modules/downloadFile.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:client/data.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -20,7 +22,7 @@ class ListScreen extends ConsumerStatefulWidget {
 
 class _ListScreenState extends ConsumerState<ListScreen> {
   Future<List<Sentence>> _connectToServer() async {
-    final url = Uri.parse('$baseURL/list');
+    final url = Uri.parse('${dotenv.get('API_SERVER')}/list');
     final res = await http.get(url);
 
     if (res.statusCode == 200) {
@@ -84,16 +86,24 @@ class _ListScreenState extends ConsumerState<ListScreen> {
                                 ),
                                 Align(
                                   alignment: Alignment.bottomRight,
-                                    child: Text(DateFormat('yyyy-M-d').format(jst),
+                                    child: Text(DateFormat('yyyy/M/d h:m').format(jst),
                                     style: const TextStyle(fontSize: fontSize * 0.7),
                                   ),
                                 ),
                                 SizedBox(width: sizedBoxWidth,),
                                 ElevatedButton(
                                   onPressed: () async {
-                                    await downloadFile('$baseURL/list/download/${sentence.sentenceId}', sentence.sentenceName);
+                                    await downloadFile('${dotenv.get('API_SERVER')}/list/download/${sentence.sentenceId}', sentence.sentenceName);
                                   },
                                   child: const Icon(Icons.download)
+                                ),
+                                SizedBox(width: sizedBoxWidth,),
+                                ElevatedButton(
+                                  onPressed: () async {
+                                    await ListScreenDelete(sentenceID: sentence.sentenceId).connectToServer();
+                                    setState(() {});
+                                  }, 
+                                  child: const Icon(Icons.delete_forever_outlined)
                                 ),
                               ],
                             ),

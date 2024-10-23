@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:client/data.dart';
 import 'package:client/modules/SentenceScreen/SentenceScreenPost.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import '../modules/SentenceScreen/PassageMath.dart';
@@ -24,7 +25,7 @@ class _SentenceScreenState extends ConsumerState<SentenceScreen> {
   late Future<List<Tag>> _futureTag;
 
   Future<List<Passage>> _getFromServerSentence() async {
-    final url = Uri.parse('$baseURL/sentence/$sentenceID');
+    final url = Uri.parse('${dotenv.get('API_SERVER')}/sentence/$sentenceID');
     final res = await http.get(url);
 
     if (res.statusCode == 200) {
@@ -38,7 +39,7 @@ class _SentenceScreenState extends ConsumerState<SentenceScreen> {
   }
 
   Future<List<Tag>> _getFromServerTag() async {
-    final url = Uri.parse('$baseURL/tag');
+    final url = Uri.parse('${dotenv.get('API_SERVER')}/tag');
     final res = await http.get(url);
 
     if (res.statusCode == 200) {
@@ -111,12 +112,13 @@ class _SentenceScreenState extends ConsumerState<SentenceScreen> {
                             switch(passage.textType) {
                               case 'text':
                                 late String textColor;
+
                                 for (var i = 0; i < tagList.length; i++) {
                                   if (passage.tagId == tagList[i].tagId) {
                                     textColor = tagList[i].tagColor;
                                   }
                                 }
-                                return PassageText(no: passage.lineNo, content: passage.passageContent, textColorI: textColor);
+                                return PassageText(no: passage.lineNo, content: passage.passageContent, textColor: textColor);
                               case 'tex':
                                 return PassageMath(content: passage.passageContent);
                               default:

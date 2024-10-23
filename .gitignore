@@ -1,1 +1,6 @@
+# memo
 /server/sql
+
+# .env
+/server/.env
+/client/assets/.env

@@ -2,8 +2,8 @@ import 'dart:convert';
 
 import 'package:client/screens/TagScreen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
-import 'package:client/const.dart';
 import 'package:client/data.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -19,14 +19,13 @@ class _TagScreenPostState extends ConsumerState<TagScreenPost> {
   late Tag tag;
 
   Future<void> _connectToServer() async {
-    final url = Uri.parse('$baseURL/tag');
+    final url = Uri.parse('${dotenv.get('API_SERVER')}/tag');
     final headers = {'content-type': 'application/json'};
     final req = Tag(
       tagId: tag.tagId, 
       tagColor: tag.tagColor, 
       tagName: tag.tagName
     );
-    print(req.tagName);
 
     final res = await http.post(
       url,

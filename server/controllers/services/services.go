@@ -19,6 +19,7 @@ type PassageServicer interface {
 // tag 関連を引き受けるサービス
 type TagServicer interface {
 	GetTagService() ([]models.Tag, error)
+	CreateTagService(tag models.Tag) error
 	PostTagService(tag models.Tag) error
 	DeleteTagService(tagID int) error
 }

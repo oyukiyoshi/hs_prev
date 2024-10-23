@@ -1,9 +1,11 @@
+import 'dart:convert';
 
-
-import 'package:client/const.dart';
+import 'package:client/data.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
+import 'package:go_router/go_router.dart';
 
 class FilePick extends StatefulWidget {
   const FilePick({super.key});
@@ -13,6 +15,8 @@ class FilePick extends StatefulWidget {
 
 class _FilePickState extends State<FilePick> {
 
+  int sentenceId = 0;
+
   Future<void> _pickUpload() async {
     try {
       FilePickerResult? result = await FilePicker.platform.pickFiles();
@@ -21,7 +25,7 @@ class _FilePickState extends State<FilePick> {
         PlatformFile pickedFile = result.files.first;
 
         if (pickedFile.bytes != null) {
-          final url = Uri.parse('$baseURL/list');
+          final url = Uri.parse('${dotenv.get('API_SERVER')}/list');
           var req = http.MultipartRequest('POST', url);
 
           req.files.add(http.MultipartFile.fromBytes(
@@ -30,11 +34,15 @@ class _FilePickState extends State<FilePick> {
             filename: pickedFile.name,
           ));
 
-          // リクエストを送信
-          var res = await req.send();
+          final res = await req.send();
 
           // ステータスコードを確認
-          if (res.statusCode != 200) {
+          if (res.statusCode == 200) {
+            final responseBody = await res.stream.bytesToString();
+            final Sentence sentence = Sentence.fromJson(jsonDecode(responseBody));
+            sentenceId = sentence.sentenceId;
+            return;
+          } else {
             throw Exception('Fail to upload file');
           }
         } else {
@@ -48,13 +56,16 @@ class _FilePickState extends State<FilePick> {
     }
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     return Center(
       child: ElevatedButton(
-        onPressed: _pickUpload, 
+        onPressed: () async {
+          await _pickUpload();
+          if (sentenceId != 0) {
+            context.go('/sentence/$sentenceId');
+          }
+        },
         child: const Icon(Icons.upload_file_outlined),
         style: OutlinedButton.styleFrom(
           shape: const CircleBorder(),

@@ -21,6 +21,14 @@ func (s *MyAppService) GetTagService() ([]models.Tag, error) {
 	return tagList, nil
 }
 
+func (s *MyAppService) CreateTagService(tag models.Tag) error {
+	err := repositories.InsertTag(s.db, tag)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (s *MyAppService) PostTagService(tag models.Tag) error {
 	err := repositories.UpdateTag(s.db, tag)
 	if err != nil {

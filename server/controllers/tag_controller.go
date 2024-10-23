@@ -3,7 +3,9 @@ package controllers
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/oyukiyoshi/hs/apperrors"
 	"github.com/oyukiyoshi/hs/controllers/services"
 	"github.com/oyukiyoshi/hs/models"
@@ -25,6 +27,17 @@ func (c *TagController) GetTagHandler(w http.ResponseWriter, req *http.Request) 
 	}
 	json.NewEncoder(w).Encode(tagList)
 }
+func (c *TagController) CreateTagHandler(w http.ResponseWriter, req *http.Request) {
+	var reqTag models.Tag
+	if err := json.NewDecoder(req.Body).Decode(&reqTag); err != nil {
+		http.Error(w, "fail to decode json\n", http.StatusBadRequest)
+	}
+	err := c.service.CreateTagService(reqTag)
+	if err != nil {
+		http.Error(w, "fail internal exec\n", http.StatusInternalServerError)
+		return
+	}
+}
 func (c *TagController) PostTagHandler(w http.ResponseWriter, req *http.Request) {
 	var reqTag models.Tag
 	if err := json.NewDecoder(req.Body).Decode(&reqTag); err != nil {
@@ -37,11 +50,14 @@ func (c *TagController) PostTagHandler(w http.ResponseWriter, req *http.Request)
 	}
 }
 func (c *TagController) DeleteTagHandler(w http.ResponseWriter, req *http.Request) {
-	var reqTag models.Tag
-	if err := json.NewDecoder(req.Body).Decode(&reqTag); err != nil {
-		http.Error(w, "fail to decode json\n", http.StatusBadRequest)
+	tagID, err := strconv.Atoi(chi.URLParam(req, "tagID"))
+	if err != nil {
+		err = apperrors.BadParam.Wrap(err, "pathparam must be number")
+		apperrors.ErrorHandler(w, req, err)
+		return
 	}
-	err := c.service.DeleteTagService(reqTag.TagID)
+
+	err = c.service.DeleteTagService(tagID)
 	if err != nil {
 		http.Error(w, "fail internal exec\n", http.StatusInternalServerError)
 		return

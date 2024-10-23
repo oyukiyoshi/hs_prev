@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:client/modules/TagScreen/TagScreenPost.dart';
 import 'package:client/modules/TagScreen/TextEditingDialog.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:client/data.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -18,7 +19,7 @@ class TagScreen extends ConsumerStatefulWidget {
 
 class _TagScreenState extends ConsumerState<TagScreen> {
   Future<List<Tag>> _connectToServer() async {
-    final url = Uri.parse('$baseURL/tag');
+    final url = Uri.parse('${dotenv.get('API_SERVER')}/tag');
     final res = await http.get(url);
 
     if (res.statusCode == 200) {

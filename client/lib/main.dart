@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import './router.dart';
 
 void main() async {
+  const envFile = String.fromEnvironment('env');
+  print(envFile);
+  await dotenv.load(fileName: ".env");
+
   final app = const MyApp();
   final scope = ProviderScope(child: app);
   runApp(scope);

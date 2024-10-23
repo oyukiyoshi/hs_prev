@@ -86,11 +86,14 @@ func (c *SentenceModuleController) PostSentenceHandler(w http.ResponseWriter, re
 }
 
 func (c *SentenceController) DeleteSentenceHandler(w http.ResponseWriter, req *http.Request) {
-	var reqSentence models.Sentence
-	if err := json.NewDecoder(req.Body).Decode(&reqSentence); err != nil {
-		http.Error(w, "fail to decode json\n", http.StatusBadRequest)
+	sentenceID, err := strconv.Atoi(chi.URLParam(req, "sentenceID"))
+	if err != nil {
+		err = apperrors.BadParam.Wrap(err, "pathparam must be number")
+		apperrors.ErrorHandler(w, req, err)
+		return
 	}
-	err := c.service.DeleteSentenceService(reqSentence.SentenceID)
+
+	err = c.service.DeleteSentenceService(sentenceID)
 	if err != nil {
 		http.Error(w, "fail internal exec\n", http.StatusInternalServerError)
 		return

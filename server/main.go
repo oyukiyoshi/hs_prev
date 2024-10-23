@@ -5,19 +5,21 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
+	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	"github.com/oyukiyoshi/hs/api"
 )
 
-var (
-	dbUser     = "postgres"
-	dbPassword = "password"
-	dbDatabase = "postgres"
-	dbConn     = fmt.Sprintf("host=127.0.0.1 port=5432 user=%s password=%s dbname=%s sslmode=disable", dbUser, dbPassword, dbDatabase)
-)
-
 func main() {
+	err := godotenv.Load(fmt.Sprintf(".env.%s", os.Getenv("GO_ENV")))
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
+	dbConn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", os.Getenv("HOST"), os.Getenv("PORT"), os.Getenv("USER"), os.Getenv("PASSWORD"), os.Getenv("DATABASE"))
+
 	db, err := sql.Open("postgres", dbConn)
 	if err != nil {
 		log.Println("fail to connect DB")

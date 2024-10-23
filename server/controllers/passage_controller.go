@@ -15,8 +15,17 @@ type PassageController struct {
 	service services.PassageServicer
 }
 
+type PassageModuleController struct {
+	serviceP services.PassageServicer
+	serviceM services.ModuleServicer
+}
+
 func NewPassageController(s services.PassageServicer) *PassageController {
 	return &PassageController{service: s}
+}
+
+func NewPassageModuleController(sp services.PassageServicer, sm services.ModuleServicer) *PassageModuleController {
+	return &PassageModuleController{serviceP: sp, serviceM: sm}
 }
 
 func (c *PassageController) GetSentenceHandler(w http.ResponseWriter, req *http.Request) {
@@ -34,12 +43,17 @@ func (c *PassageController) GetSentenceHandler(w http.ResponseWriter, req *http.
 	}
 	json.NewEncoder(w).Encode(sentenceList)
 }
-func (c *PassageController) PostSentenceHandler(w http.ResponseWriter, req *http.Request) {
+func (c *PassageModuleController) PostSentenceHandler(w http.ResponseWriter, req *http.Request) {
 	var reqSentence models.Passage
 	if err := json.NewDecoder(req.Body).Decode(&reqSentence); err != nil {
 		http.Error(w, "fail to decode json\n", http.StatusBadRequest)
 	}
-	err := c.service.PostPassageService(reqSentence)
+	err := c.serviceP.PostPassageService(reqSentence)
+	if err != nil {
+		http.Error(w, "fail internal exec\n", http.StatusInternalServerError)
+		return
+	}
+	err = c.serviceM.ConvertDB2mdService(reqSentence.SentenceID)
 	if err != nil {
 		http.Error(w, "fail internal exec\n", http.StatusInternalServerError)
 		return
